@@ -9,7 +9,7 @@ QT += core gui widgets
 TARGET = qlinphone
 TEMPLATE = app
 
-#CONFIG += c++11
+CONFIG += c++11
 QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-unused-parameter -Wno-unused-variable
 
 SOURCES += main.cpp\
