@@ -1,0 +1,7 @@
+
+
+before_script:
+  - qmake
+
+job1:
+  script: "make -j3" 
