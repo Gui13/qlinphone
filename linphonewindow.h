@@ -20,6 +20,9 @@ public:
 private slots:
     void on_addConversationBtn_clicked();
 
+	void on_accountOptions_clicked();
+	void accountOptions_Action_Triggered(QAction *action);
+
 private:
     Ui::LinphoneWindow *ui;
     QLinphoneCore* core;

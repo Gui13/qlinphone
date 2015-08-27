@@ -15,15 +15,20 @@ QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-unused-parameter -Wno-unused-variable
 SOURCES += main.cpp\
         linphonewindow.cpp \
     qlinphonecore.cpp \
-    conversationmodel.cpp \
-    chatroommodel.cpp
+    qlchatrooms.cpp \
+    qlchatroom.cpp \
+    qlmessage.cpp \
+    accountpreferences.cpp
 
 HEADERS  += linphonewindow.h \
     qlinphonecore.h \
-    conversationmodel.h \
-    chatroommodel.h
+    qlchatrooms.h \
+    qlchatroom.h \
+    qlmessage.h \
+    accountpreferences.h
 
-FORMS    += linphonewindow.ui
+FORMS    += linphonewindow.ui \
+    accountpreferences.ui
 
-LIBS += -L/usr/local/lib/ -llinphone -lmediastreamer_base -lmediastreamer_voip
+LIBS += -L/usr/local/lib/ -llinphone -lmediastreamer_base -lmediastreamer_voip -lortp
 INCLUDEPATH += /usr/local/include

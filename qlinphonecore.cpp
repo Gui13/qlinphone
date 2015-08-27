@@ -9,6 +9,11 @@ static void qlinphone_global_state_changed(LinphoneCore*, LinphoneGlobalState, c
     qDebug() << "Global state changed:" << msg;
 }
 
+static void qlinphone_message_received(LinphoneCore *lc, LinphoneChatRoom *room, LinphoneChatMessage *message){
+	QLinphoneCore* c = (QLinphoneCore*) linphone_core_get_user_data(lc);
+	c->onMessageReceived(room, message);
+}
+
 
 QLinphoneCore::QLinphoneCore(QObject *parent) : QObject(parent)
 {
@@ -21,6 +26,7 @@ QLinphoneCore::QLinphoneCore(QObject *parent) : QObject(parent)
     static LinphoneCoreVTable vtable = {0};
 
     vtable.global_state_changed = qlinphone_global_state_changed;
+	vtable.message_received = qlinphone_message_received;
 
     core = linphone_core_new(&vtable, config_file.toStdString().c_str() , NULL, this);
 }
@@ -47,16 +53,21 @@ QList<LinphoneProxyConfig *> QLinphoneCore::accounts() const
 	return list;
 }
 
-QList<ChatRoomModel> QLinphoneCore::chatRooms() const
+QList<QLChatRoom> QLinphoneCore::chatRooms() const
 {
 	MSList* rooms = linphone_core_get_chat_rooms(core);
-	QList<ChatRoomModel> l;
+	QList<QLChatRoom> l;
 	MSList* iter = rooms;
 	while(iter){
-		l.append(ChatRoomModel((LinphoneChatRoom*)iter->data));
+		l.append(QLChatRoom((LinphoneChatRoom*)iter->data));
 		iter=iter->next;
 	}
 	ms_list_free(rooms);
 	return l;
+}
+
+void QLinphoneCore::onMessageReceived(LinphoneChatRoom *room, LinphoneChatMessage *msg)
+{
+	emit messageReceived(QLChatRoom(room), QLMessage(msg));
 }
 

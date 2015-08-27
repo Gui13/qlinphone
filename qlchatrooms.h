@@ -4,25 +4,25 @@
 #include <QAbstractListModel>
 #include "qlinphonecore.h"
 
-class ConversationModel : public QAbstractListModel
+class QLChatRooms : public QAbstractListModel
 {
 	Q_OBJECT
 
 public:
-    ConversationModel(QLinphoneCore* qlc);
-    ~ConversationModel();
+	QLChatRooms(QLinphoneCore* qlc);
+	~QLChatRooms();
 
     virtual int rowCount(const QModelIndex &parent) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
 
 private:
     QLinphoneCore* qlc;
-	QList<ChatRoomModel> rooms;
+	QList<QLChatRoom> rooms;
 
 private slots:
-	void onChatRoomUpdate(QList<ChatRoomModel> chatrooms);
+	void onChatRoomUpdate(QList<QLChatRoom> chatrooms);
 };
 
-Q_DECLARE_METATYPE(ChatRoomModel)
+Q_DECLARE_METATYPE(QLChatRoom)
 
 #endif // CONVERSATIONMODEL_H

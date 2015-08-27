@@ -3,8 +3,12 @@
 
 
 #include <QObject>
-#include "chatroommodel.h"
+#include "qlchatroom.h"
+#include "qlmessage.h"
 #include "linphone/linphonecore.h"
+
+static void qlinphone_global_state_changed(LinphoneCore*, LinphoneGlobalState, const char *msg);
+static void qlinphone_message_received(LinphoneCore *lc, LinphoneChatRoom *room, LinphoneChatMessage *message);
 
 class QLinphoneCore : public QObject
 {
@@ -14,15 +18,24 @@ public:
     ~QLinphoneCore();
 
     QList<LinphoneProxyConfig *> accounts() const;
-	QList<ChatRoomModel> chatRooms() const;
+	QList<QLChatRoom> chatRooms() const;
 
 signals:
-	void chatRoomsUpdated(QList<ChatRoomModel> rooms);
+	void chatRoomsUpdated(QList<QLChatRoom> rooms);
+	void messageReceived(QLChatRoom room, QLMessage msg);
 
 public slots:
 
 private:
     LinphoneCore* core;
+
+	void onMessageReceived(LinphoneChatRoom* room, LinphoneChatMessage* msg);
+
+
+// friendly statics:
+	friend void qlinphone_global_state_changed(LinphoneCore*, LinphoneGlobalState, const char *msg);
+	friend void qlinphone_message_received(LinphoneCore *lc, LinphoneChatRoom *room, LinphoneChatMessage *message);
+
 };
 
 #endif // QLINPHONECORE_H
