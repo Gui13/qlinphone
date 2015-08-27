@@ -1,4 +1,6 @@
+.qmake.stash
 *.o
+moc_*
 ui_*.h
 *.app
 *.user
