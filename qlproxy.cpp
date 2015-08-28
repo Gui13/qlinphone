@@ -1,6 +1,6 @@
 #include "qlproxy.h"
 
-QLProxy::QLProxy(QObject *parent) : QObject(parent)
+QLProxy::QLProxy(LinphoneProxyConfig *cfg, QObject *parent) : QObject(parent), proxy(cfg)
 {
 
 }
