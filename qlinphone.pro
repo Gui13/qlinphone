@@ -18,14 +18,16 @@ SOURCES += main.cpp\
     qlchatrooms.cpp \
     qlchatroom.cpp \
     qlmessage.cpp \
-    accountpreferences.cpp
+    accountpreferences.cpp \
+    qlproxy.cpp
 
 HEADERS  += linphonewindow.h \
     qlinphonecore.h \
     qlchatrooms.h \
     qlchatroom.h \
     qlmessage.h \
-    accountpreferences.h
+    accountpreferences.h \
+    qlproxy.h
 
 FORMS    += linphonewindow.ui \
     accountpreferences.ui

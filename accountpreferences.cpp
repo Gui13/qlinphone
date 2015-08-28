@@ -36,7 +36,6 @@ void AccountPreferences::loadProxySettings() {
 }
 
 void AccountPreferences::applyProxy( LinphoneProxyConfig *cfg ) {
-	linphone_proxy_config_edit(cfg);
 	linphone_proxy_config_set_server_addr(cfg, ui->server->text().toStdString().c_str());
 	linphone_proxy_config_set_identity(cfg,ui->identity->text().toStdString().c_str());
 	linphone_proxy_config_set_expires(cfg,ui->registrationPeriod->value());
@@ -47,15 +46,22 @@ void AccountPreferences::applyProxy( LinphoneProxyConfig *cfg ) {
 	linphone_proxy_config_enable_publish(cfg, ui->publishPresence->isChecked());
 	linphone_proxy_config_enable_avpf(cfg, ui->enableAVPF->isChecked());
 
-	linphone_proxy_config_done(cfg);
 }
 
 void AccountPreferences::accepted() {
-	if(new_proxy) proxy = qlc->createNewProxy();
+	if(new_proxy){
+		proxy = qlc->createNewProxy();
+	} else {
+		linphone_proxy_config_edit(proxy);
+	}
 
 	applyProxy(proxy);
 
-	if(new_proxy) qlc->addProxy(proxy);
+	if(new_proxy){
+		qlc->addProxy(proxy);
+	} else {
+		linphone_proxy_config_done(proxy);
+	}
 }
 
 void AccountPreferences::checkFields() {
@@ -72,10 +78,9 @@ bool AccountPreferences::checkField(QLineEdit* field, bool optional) {
 		return true;
 	}
 
-	const char* fieldText = field->text().toStdString().c_str();
-	LinphoneAddress *addr = linphone_address_new(fieldText);
+	QByteArray arr = field->text().toLatin1();
+	LinphoneAddress *addr = linphone_core_interpret_url(qlc->core(),arr.constData());
 	if( addr != NULL) {
-		qDebug() << "Addr for" << field->text() << "is" << addr;
 		field->setStyleSheet("color: green");
 		linphone_address_destroy(addr);
 		return true;
@@ -83,7 +88,6 @@ bool AccountPreferences::checkField(QLineEdit* field, bool optional) {
 		field->setStyleSheet("color: red");
 		return false;
 	}
-
 }
 
 AccountPreferences::~AccountPreferences()

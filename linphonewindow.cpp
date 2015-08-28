@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QMessageBox>
 
 #include "linphonewindow.h"
 #include "ui_linphonewindow.h"
@@ -13,20 +14,20 @@ LinphoneWindow::LinphoneWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 	setupProxyList();
+	connect(core, &QLinphoneCore::registrationStateChanged, this, &LinphoneWindow::registrationStateChanged);
 }
 
 LinphoneWindow::~LinphoneWindow()
 {
 	delete ui;
-
 }
 
 void LinphoneWindow::setupProxyList() {
 	auto proxies = core->accounts();
+	ui->accountCombo->clear();
 	if( proxies.size() > 0){
 		for( auto proxy : proxies ){
-			// TODO: change the variant to hold a reference to the Proxy?
-			ui->accountCombo->addItem(linphone_proxy_config_get_identity(proxy), QVariant());
+			ui->accountCombo->addItem(linphone_proxy_config_get_identity(proxy));
 		}
 	} else {
 		ui->accountCombo->setDisabled(true);
@@ -36,7 +37,7 @@ void LinphoneWindow::setupProxyList() {
 void LinphoneWindow::displayProxyPreferences(LinphoneProxyConfig* proxy) {
 	AccountPreferences* prefs = new AccountPreferences(core, proxy, this);
 	prefs->setModal(true);
-	connect(prefs, &AccountPreferences::finished, this, &LinphoneWindow::setupProxyList);
+	connect(prefs, &AccountPreferences::finished, this, &LinphoneWindow::prefsFinished);
 	prefs->show();
 }
 
@@ -46,15 +47,51 @@ void LinphoneWindow::prefsFinished(int result) {
 	}
 }
 
+void LinphoneWindow::updateRegstate(LinphoneRegistrationState state ){
+	QString color = "red";
+	switch (state) {
+	case LinphoneRegistrationOk:
+		color = ("green");
+		break;
+	case LinphoneRegistrationProgress:
+		color = ("yellow");
+		break;
+	default:
+		break;
+	}
+	// TODO: paint with correct color
+	ui->accountStatus->setStyleSheet("background-color:"+color);
+}
+
+void LinphoneWindow::registrationStateChanged(QLProxy cfg, LinphoneRegistrationState state)
+{
+	auto accounts = core->accounts();
+	int currentIndex = ui->accountCombo->currentIndex();
+	for( int i = 0; i<accounts.size(); i++){
+		if( accounts.at(i) == cfg.proxy && i == currentIndex ) {
+			// regstate changed for the current account
+			updateRegstate(state);
+		}
+	}
+}
+
 void LinphoneWindow::accountOptions_Action_Triggered(QAction* action ){
 	qDebug() << "Action:" << action->text();
 	if( action->text() == "New Account"){
-		// TODO: display UI to add an account
 		displayProxyPreferences(NULL);
 	} else if( action->text() == "Remove" ) {
-		// TODO: get current proxy and remove it
+
+		auto reply = QMessageBox::question(this,
+					   "Remove proxy",
+					   "Do you really want to remove the proxy for " + ui->accountCombo->currentText(),
+					   QMessageBox::Yes|QMessageBox::No);
+
+		if( reply == QMessageBox::Yes) {
+			linphone_core_remove_proxy_config(core->core(), getCurrentSelectedProxy());
+			setupProxyList();
+		}
+
 	} else if( action->text() == "Edit" ){
-		// TODO: display UI to edit the account
 		displayProxyPreferences(getCurrentSelectedProxy() );
 	}
 }

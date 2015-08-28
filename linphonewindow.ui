@@ -77,21 +77,30 @@
             <item row="0" column="0">
              <layout class="QHBoxLayout" name="accountLayout">
               <item>
-               <widget class="QGraphicsView" name="accountStatus">
+               <widget class="QWidget" name="accountStatus" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
                 <property name="maximumSize">
                  <size>
                   <width>20</width>
                   <height>20</height>
                  </size>
                 </property>
-                <property name="foregroundBrush">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>82</red>
-                   <green>204</green>
-                   <blue>83</blue>
-                  </color>
-                 </brush>
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color:red</string>
                 </property>
                </widget>
               </item>

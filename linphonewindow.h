@@ -25,11 +25,15 @@ private slots:
 	void setupProxyList();
 
 	void prefsFinished(int result);
+
+	void registrationStateChanged(QLProxy cfg, LinphoneRegistrationState state);
+
 private:
     Ui::LinphoneWindow *ui;
 	QLinphoneCore* core;
 	void displayProxyPreferences(LinphoneProxyConfig *proxy);
 	LinphoneProxyConfig *getCurrentSelectedProxy();
+	void updateRegstate(LinphoneRegistrationState state);
 };
 
 #endif // LINPHONEWINDOW_H

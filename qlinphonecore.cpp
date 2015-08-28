@@ -1,6 +1,8 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include <QDir>
+#include <QInputDialog>
+#include <QTimer>
 #include "qlinphonecore.h"
 #include "linphone/linphonecore.h"
 
@@ -12,6 +14,24 @@ static void qlinphone_global_state_changed(LinphoneCore*, LinphoneGlobalState, c
 static void qlinphone_message_received(LinphoneCore *lc, LinphoneChatRoom *room, LinphoneChatMessage *message){
 	QLinphoneCore* c = (QLinphoneCore*) linphone_core_get_user_data(lc);
 	c->onMessageReceived(room, message);
+}
+
+static void qlinphone_auth_info_requested(LinphoneCore *lc, const char *realm, const char *username, const char *domain){
+	QString message = "Please enter password for user " + QString(username) + "@" + QString(domain);
+	bool ok;
+	QLinphoneCore* c = (QLinphoneCore*) linphone_core_get_user_data(lc);
+	QString password = QInputDialog::getText(NULL, "Authentication required", message, QLineEdit::Password, "", &ok);
+	if( ok && !password.isEmpty() ){
+		auto cstringArray = password.toUtf8();
+		LinphoneAuthInfo* info = linphone_auth_info_new(username, NULL, cstringArray.data(), NULL, realm, domain);
+		linphone_core_add_auth_info(lc, info);
+	}
+}
+
+static void qlinphone_registration_state_changed(LinphoneCore *lc, LinphoneProxyConfig *cfg, LinphoneRegistrationState cstate, const char *message) {
+	qDebug() << "Registration state changed:" << message;
+	QLinphoneCore* c = (QLinphoneCore*) linphone_core_get_user_data(lc);
+	c->onRegistrationStateChanged(cfg, cstate);
 }
 
 
@@ -27,8 +47,15 @@ QLinphoneCore::QLinphoneCore(QObject *parent) : QObject(parent)
 
     vtable.global_state_changed = qlinphone_global_state_changed;
 	vtable.message_received = qlinphone_message_received;
+	vtable.auth_info_requested = qlinphone_auth_info_requested;
+	vtable.registration_state_changed = qlinphone_registration_state_changed;
 
 	lc = linphone_core_new(&vtable, config_file.toStdString().c_str() , NULL, this);
+
+	// iterate
+	QTimer *timer = new QTimer();
+	connect(timer, &QTimer::timeout, this, &QLinphoneCore::iterate);
+	timer->start(20);
 }
 
 QLinphoneCore::~QLinphoneCore()
@@ -75,8 +102,16 @@ void QLinphoneCore::addProxy( LinphoneProxyConfig *cfg){
 	linphone_core_add_proxy_config(lc, cfg);
 }
 
+void QLinphoneCore::iterate()
+{
+	linphone_core_iterate(lc);
+}
+
 void QLinphoneCore::onMessageReceived(LinphoneChatRoom *room, LinphoneChatMessage *msg)
 {
 	emit messageReceived(QLChatRoom(room), QLMessage(msg));
 }
 
+void QLinphoneCore::onRegistrationStateChanged(LinphoneProxyConfig *cfg, LinphoneRegistrationState state) {
+	emit registrationStateChanged(QLProxy(cfg),state);
+}
