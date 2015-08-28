@@ -12,15 +12,7 @@ LinphoneWindow::LinphoneWindow(QWidget *parent) :
 	core(new QLinphoneCore(this))
 {
 	ui->setupUi(this);
-	auto proxies = core->accounts();
-	if( proxies.size() > 0){
-		for( auto proxy : proxies ){
-			// TODO: change the variant to hold a reference to the Proxy
-			ui->accountCombo->addItem(linphone_proxy_config_get_identity(proxy), QVariant());
-		}
-	} else {
-		ui->accountCombo->setDisabled(true);
-	}
+	setupProxyList();
 }
 
 LinphoneWindow::~LinphoneWindow()
@@ -29,18 +21,50 @@ LinphoneWindow::~LinphoneWindow()
 
 }
 
+void LinphoneWindow::setupProxyList() {
+	auto proxies = core->accounts();
+	if( proxies.size() > 0){
+		for( auto proxy : proxies ){
+			// TODO: change the variant to hold a reference to the Proxy?
+			ui->accountCombo->addItem(linphone_proxy_config_get_identity(proxy), QVariant());
+		}
+	} else {
+		ui->accountCombo->setDisabled(true);
+	}
+}
+
+void LinphoneWindow::displayProxyPreferences(LinphoneProxyConfig* proxy) {
+	AccountPreferences* prefs = new AccountPreferences(core, proxy, this);
+	prefs->setModal(true);
+	connect(prefs, &AccountPreferences::finished, this, &LinphoneWindow::setupProxyList);
+	prefs->show();
+}
+
+void LinphoneWindow::prefsFinished(int result) {
+	if(result == QDialog::Accepted) {
+		setupProxyList();
+	}
+}
+
 void LinphoneWindow::accountOptions_Action_Triggered(QAction* action ){
 	qDebug() << "Action:" << action->text();
 	if( action->text() == "New Account"){
 		// TODO: display UI to add an account
-		AccountPreferences* prefs = new AccountPreferences(this);
-		prefs->setModal(true);
-		prefs->show();
+		displayProxyPreferences(NULL);
 	} else if( action->text() == "Remove" ) {
 		// TODO: get current proxy and remove it
 	} else if( action->text() == "Edit" ){
 		// TODO: display UI to edit the account
+		displayProxyPreferences(getCurrentSelectedProxy() );
 	}
+}
+
+LinphoneProxyConfig *LinphoneWindow::getCurrentSelectedProxy() {
+	auto proxies = core->accounts();
+	if( proxies.size() )
+		return proxies.at(ui->accountCombo->currentIndex());
+	else
+		return NULL;
 }
 
 void LinphoneWindow::on_addConversationBtn_clicked()

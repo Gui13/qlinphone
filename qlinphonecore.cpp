@@ -28,14 +28,14 @@ QLinphoneCore::QLinphoneCore(QObject *parent) : QObject(parent)
     vtable.global_state_changed = qlinphone_global_state_changed;
 	vtable.message_received = qlinphone_message_received;
 
-    core = linphone_core_new(&vtable, config_file.toStdString().c_str() , NULL, this);
+	lc = linphone_core_new(&vtable, config_file.toStdString().c_str() , NULL, this);
 }
 
 QLinphoneCore::~QLinphoneCore()
 {
-    if( core ){
-        linphone_core_destroy(core);
-        core = NULL;
+	if( lc ){
+		linphone_core_destroy(lc);
+		lc = NULL;
     }
 }
 
@@ -44,7 +44,7 @@ QLinphoneCore::~QLinphoneCore()
 QList<LinphoneProxyConfig *> QLinphoneCore::accounts() const
 {
     QList<LinphoneProxyConfig*> list;
-    const MSList* proxies = linphone_core_get_proxy_config_list(core);
+	const MSList* proxies = linphone_core_get_proxy_config_list(lc);
     const MSList* proxy = proxies;
     while( proxy ){
         list.append((LinphoneProxyConfig*)proxy->data);
@@ -55,7 +55,7 @@ QList<LinphoneProxyConfig *> QLinphoneCore::accounts() const
 
 QList<QLChatRoom> QLinphoneCore::chatRooms() const
 {
-	MSList* rooms = linphone_core_get_chat_rooms(core);
+	MSList* rooms = linphone_core_get_chat_rooms(lc);
 	QList<QLChatRoom> l;
 	MSList* iter = rooms;
 	while(iter){
@@ -64,6 +64,15 @@ QList<QLChatRoom> QLinphoneCore::chatRooms() const
 	}
 	ms_list_free(rooms);
 	return l;
+}
+
+LinphoneProxyConfig *QLinphoneCore::createNewProxy() const
+{
+	return linphone_core_create_proxy_config(lc);
+}
+
+void QLinphoneCore::addProxy( LinphoneProxyConfig *cfg){
+	linphone_core_add_proxy_config(lc, cfg);
 }
 
 void QLinphoneCore::onMessageReceived(LinphoneChatRoom *room, LinphoneChatMessage *msg)

@@ -17,9 +17,13 @@ public:
     explicit QLinphoneCore(QObject *parent = 0);
     ~QLinphoneCore();
 
+	LinphoneCore* core() const { return lc; }
+
     QList<LinphoneProxyConfig *> accounts() const;
 	QList<QLChatRoom> chatRooms() const;
+	LinphoneProxyConfig *createNewProxy() const;
 
+	void addProxy(LinphoneProxyConfig *cfg);
 signals:
 	void chatRoomsUpdated(QList<QLChatRoom> rooms);
 	void messageReceived(QLChatRoom room, QLMessage msg);
@@ -27,7 +31,7 @@ signals:
 public slots:
 
 private:
-    LinphoneCore* core;
+	LinphoneCore* lc;
 
 	void onMessageReceived(LinphoneChatRoom* room, LinphoneChatMessage* msg);
 

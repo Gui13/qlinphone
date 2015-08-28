@@ -22,10 +22,14 @@ private slots:
 
 	void on_accountOptions_clicked();
 	void accountOptions_Action_Triggered(QAction *action);
+	void setupProxyList();
 
+	void prefsFinished(int result);
 private:
     Ui::LinphoneWindow *ui;
-    QLinphoneCore* core;
+	QLinphoneCore* core;
+	void displayProxyPreferences(LinphoneProxyConfig *proxy);
+	LinphoneProxyConfig *getCurrentSelectedProxy();
 };
 
 #endif // LINPHONEWINDOW_H
