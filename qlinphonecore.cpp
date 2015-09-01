@@ -82,14 +82,13 @@ QList<LinphoneProxyConfig *> QLinphoneCore::accounts() const
 
 QList<QLChatRoom> QLinphoneCore::chatRooms() const
 {
-	MSList* rooms = linphone_core_get_chat_rooms(lc);
+	const MSList* rooms = linphone_core_get_chat_rooms(lc);
 	QList<QLChatRoom> l;
-	MSList* iter = rooms;
+	const MSList* iter = rooms;
 	while(iter){
 		l.append(QLChatRoom((LinphoneChatRoom*)iter->data));
 		iter=iter->next;
 	}
-	ms_list_free(rooms);
 	return l;
 }
 
