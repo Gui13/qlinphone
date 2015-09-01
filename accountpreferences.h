@@ -19,7 +19,7 @@ public:
 	~AccountPreferences();
 
 public slots:
-	void accepted();
+	void acceptPressed();
 
 private slots:
 	void checkFields();

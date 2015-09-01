@@ -17,7 +17,7 @@ AccountPreferences::AccountPreferences(QLinphoneCore *core, LinphoneProxyConfig*
 	}
 	setAttribute(Qt::WA_DeleteOnClose);
 	ui->identity->setFocus();
-	connect(ui->buttonBox,&QDialogButtonBox::accepted, this, &AccountPreferences::accepted);
+	connect(ui->buttonBox,&QDialogButtonBox::accepted, this, &AccountPreferences::acceptPressed);
 	QTimer *timer = new QTimer(this);
 	connect(timer, &QTimer::timeout, this, &AccountPreferences::checkFields);
 	timer->start(1000);
@@ -27,8 +27,10 @@ void AccountPreferences::loadProxySettings() {
 	ui->server->setText( linphone_proxy_config_get_server_addr(proxy) );
 	ui->identity->setText(linphone_proxy_config_get_identity(proxy));
 	ui->registrationPeriod->setValue(linphone_proxy_config_get_expires(proxy));
+
 	QString transport = linphone_proxy_config_get_transport(proxy);
 	ui->transport->setCurrentText(transport.toUpper());
+
 	ui->route->setText(linphone_proxy_config_get_route(proxy));
 	ui->enableRegistration->setChecked(linphone_proxy_config_register_enabled(proxy));
 	ui->publishPresence->setChecked(linphone_proxy_config_publish_enabled(proxy));
@@ -48,7 +50,7 @@ void AccountPreferences::applyProxy( LinphoneProxyConfig *cfg ) {
 
 }
 
-void AccountPreferences::accepted() {
+void AccountPreferences::acceptPressed() {
 	if(new_proxy){
 		proxy = qlc->createNewProxy();
 	} else {

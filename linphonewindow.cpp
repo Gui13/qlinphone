@@ -37,14 +37,12 @@ void LinphoneWindow::setupProxyList() {
 void LinphoneWindow::displayProxyPreferences(LinphoneProxyConfig* proxy) {
 	AccountPreferences* prefs = new AccountPreferences(core, proxy, this);
 	prefs->setModal(true);
-	connect(prefs, &AccountPreferences::finished, this, &LinphoneWindow::prefsFinished);
 	prefs->show();
+	connect(prefs, &AccountPreferences::destroyed, this, &LinphoneWindow::prefsAccepted);
 }
 
-void LinphoneWindow::prefsFinished(int result) {
-	if(result == QDialog::Accepted) {
-		setupProxyList();
-	}
+void LinphoneWindow::prefsAccepted(QObject*) {
+	setupProxyList();
 }
 
 void LinphoneWindow::updateRegstate(LinphoneRegistrationState state ){

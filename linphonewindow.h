@@ -24,7 +24,7 @@ private slots:
 	void accountOptions_Action_Triggered(QAction *action);
 	void setupProxyList();
 
-	void prefsFinished(int result);
+	void prefsAccepted(QObject *);
 
 	void registrationStateChanged(QLProxy cfg, LinphoneRegistrationState state);
 
