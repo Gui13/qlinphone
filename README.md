@@ -1,4 +1,4 @@
-![Status](http://ci.neolyse.info/projects/1/status.png)
+[![build status](http://ci.neolyse.info/projects/1/status.png?ref=master)](http://ci.neolyse.info/projects/1?ref=master)
 
 A Qt UI for Linphone.
 
