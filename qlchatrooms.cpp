@@ -23,5 +23,8 @@ QVariant QLChatRooms::data(const QModelIndex &index, int role) const
 }
 
 void QLChatRooms::onChatRoomUpdate(QList<QLChatRoom> chatrooms) {
+	// TODO: for performance, we should use "dataChanged()" instead of this
+	beginResetModel();
 	rooms = chatrooms;
+	endResetModel();
 }

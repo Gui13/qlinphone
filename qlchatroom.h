@@ -18,7 +18,7 @@ public:
 	}
 
 	int historySize() { return linphone_chat_room_get_history_size(room); }
-
+	LinphoneChatRoom *getRoom() const { return room; }
 signals:
 
 public slots:
