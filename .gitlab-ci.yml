@@ -3,5 +3,12 @@
 before_script:
   - qmake
 
-job1:
+linux_build:
   script: "make -j3" 
+  tags:
+    - linux
+
+mac_build:
+  script: "make -j3"
+  tags:
+    - mac
