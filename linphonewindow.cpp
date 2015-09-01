@@ -6,6 +6,7 @@
 
 #include "qlinphonecore.h"
 #include "accountpreferences.h"
+#include "qlchatrooms.h"
 
 LinphoneWindow::LinphoneWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -14,6 +15,8 @@ LinphoneWindow::LinphoneWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 	setupProxyList();
+	setupChatroomsModel();
+	loadChatRooms();
 	connect(core, &QLinphoneCore::registrationStateChanged, this, &LinphoneWindow::registrationStateChanged);
 }
 
@@ -22,12 +25,36 @@ LinphoneWindow::~LinphoneWindow()
 	delete ui;
 }
 
+void LinphoneWindow::loadChatRooms() {
+	auto chatrooms = core->chatRooms();
+	chatRoomsModel->clear();
+	ui->itemchatroomlist->clear();
+	int row = 0;
+	foreach (auto chatroom, chatrooms) {
+		const LinphoneAddress *addr = linphone_chat_room_get_peer_address(chatroom.getRoom());
+		auto username = linphone_address_get_username(addr);
+		// TODO: use model-based version
+		ui->itemchatroomlist->addItem(username);
+		row++;
+	}
+}
+
+void LinphoneWindow::setupChatroomsModel() {
+	chatRoomsModel = new QStandardItemModel(1,2,this);
+	chatRoomsModel->setHeaderData(0, Qt::Horizontal, "Destination");
+	chatRoomsModel->setHeaderData(1, Qt::Horizontal, "Unread Msgs");
+}
+
 void LinphoneWindow::setupProxyList() {
 	auto proxies = core->accounts();
 	ui->accountCombo->clear();
 	if( proxies.size() > 0){
+		QPixmap pix = QPixmap(22,22);
+		pix.fill(QColor("grey"));
+		QIcon icon(pix);
 		for( auto proxy : proxies ){
-			ui->accountCombo->addItem(linphone_proxy_config_get_identity(proxy));
+
+			ui->accountCombo->addItem(icon, linphone_proxy_config_get_identity(proxy));
 		}
 	} else {
 		ui->accountCombo->setDisabled(true);
@@ -45,7 +72,8 @@ void LinphoneWindow::prefsAccepted(QObject*) {
 	setupProxyList();
 }
 
-void LinphoneWindow::updateRegstate(LinphoneRegistrationState state ){
+QString LinphoneWindow::getProxyColorForState(LinphoneRegistrationState state)
+{
 	QString color = "red";
 	switch (state) {
 	case LinphoneRegistrationOk:
@@ -57,18 +85,29 @@ void LinphoneWindow::updateRegstate(LinphoneRegistrationState state ){
 	default:
 		break;
 	}
-	// TODO: paint with correct color
-	ui->accountStatus->setStyleSheet("background-color:"+color);
+
+	return color;
+}
+
+void LinphoneWindow::setAccountIconColor(int proxy_index, const QString &color)
+{
+	QPixmap pix = QPixmap(22,22);
+	pix.fill(QColor(color));
+	QIcon icon(pix);
+	ui->accountCombo->setItemIcon(proxy_index, icon);
 }
 
 void LinphoneWindow::registrationStateChanged(QLProxy cfg, LinphoneRegistrationState state)
 {
 	auto accounts = core->accounts();
-	int currentIndex = ui->accountCombo->currentIndex();
+	QString color = getProxyColorForState(state);
+
 	for( int i = 0; i<accounts.size(); i++){
-		if( accounts.at(i) == cfg.proxy && i == currentIndex ) {
-			// regstate changed for the current account
-			updateRegstate(state);
+
+		if( accounts.at(i) == cfg.proxy)
+		{
+			setAccountIconColor(i, color);
+			break;
 		}
 	}
 }
@@ -121,4 +160,52 @@ void LinphoneWindow::on_accountOptions_clicked()
 	connect(menu, &QMenu::triggered, this, &LinphoneWindow::accountOptions_Action_Triggered);
 
 	menu->popup(QCursor::pos());
+}
+
+bool LinphoneWindow::validateAddress(QLineEdit *field){
+	if(field->text() == "") {
+		field->setStyleSheet("color: black");
+		return true;
+	}
+
+	QByteArray arr = field->text().toLatin1();
+	LinphoneAddress *addr = linphone_core_interpret_url(core->core(),arr.constData());
+	if( addr != NULL) {
+		field->setStyleSheet("color: green");
+		linphone_address_destroy(addr);
+		return true;
+	} else {
+		field->setStyleSheet("color: red");
+		return false;
+	}
+}
+
+void LinphoneWindow::on_searchBar_textChanged(const QString &arg1)
+{
+	bool ok = validateAddress( ui->searchBar );
+	ui->addConversationBtn->setEnabled(ok);
+}
+
+void LinphoneWindow::on_searchBar_returnPressed()
+{
+	if (validateAddress(ui->searchBar)){
+		qDebug() << "Starting conversation with" << ui->searchBar->text();
+		QByteArray toAddr = ui->searchBar->text().toLatin1();
+		LinphoneCore *c = core->core();
+		const char* to_addr = toAddr.constData();
+		auto chatroom = linphone_core_get_or_create_chat_room(c, to_addr);
+
+		auto peeraddr = linphone_chat_room_get_peer_address(chatroom);
+		char* peerstring = linphone_address_as_string(peeraddr);
+		qDebug() << "Chatroom for" << peerstring;
+		ms_free(peerstring);
+		ui->searchBar->clear();
+		loadChatRooms();
+	}
+}
+
+void LinphoneWindow::on_accountCombo_currentIndexChanged(int index)
+{
+	linphone_core_set_default_proxy_index(core->core(), index);
+	qDebug() << "Default proxy index set to" << index;
 }

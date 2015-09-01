@@ -2,6 +2,8 @@
 #define LINPHONEWINDOW_H
 
 #include <QMainWindow>
+#include <QLineEdit>
+#include <QStandardItemModel>
 #include "linphone/linphonecore.h"
 #include "qlinphonecore.h"
 
@@ -17,6 +19,8 @@ public:
     explicit LinphoneWindow(QWidget *parent = 0);
     ~LinphoneWindow();
 
+	void loadChatRooms();
+	void setupChatroomsModel();
 private slots:
     void on_addConversationBtn_clicked();
 
@@ -28,12 +32,21 @@ private slots:
 
 	void registrationStateChanged(QLProxy cfg, LinphoneRegistrationState state);
 
+	void on_searchBar_textChanged(const QString &arg1);
+
+	void on_searchBar_returnPressed();
+
+	void on_accountCombo_currentIndexChanged(int index);
+
 private:
     Ui::LinphoneWindow *ui;
 	QLinphoneCore* core;
+	QStandardItemModel *chatRoomsModel;
 	void displayProxyPreferences(LinphoneProxyConfig *proxy);
 	LinphoneProxyConfig *getCurrentSelectedProxy();
-	void updateRegstate(LinphoneRegistrationState state);
+	bool validateAddress(QLineEdit *field);
+	QString getProxyColorForState(LinphoneRegistrationState state);
+	void setAccountIconColor(int proxy_index, const QString &color);
 };
 
 #endif // LINPHONEWINDOW_H

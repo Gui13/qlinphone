@@ -77,34 +77,6 @@
             <item row="0" column="0">
              <layout class="QHBoxLayout" name="accountLayout">
               <item>
-               <widget class="QWidget" name="accountStatus" native="true">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>20</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>20</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="autoFillBackground">
-                 <bool>false</bool>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">background-color:red</string>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QComboBox" name="accountCombo">
                 <property name="currentText">
                  <string/>
@@ -127,7 +99,11 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QListView" name="conversationsList"/>
+          <widget class="QListWidget" name="itemchatroomlist">
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
