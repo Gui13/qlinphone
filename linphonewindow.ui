@@ -109,7 +109,28 @@
        </widget>
       </item>
       <item>
-       <widget class="QListView" name="chatList"/>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QListView" name="chatList"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="messageBox"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="sendMessage">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Send</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -137,5 +158,22 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>messageBox</sender>
+   <signal>returnPressed()</signal>
+   <receiver>sendMessage</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>543</x>
+     <y>465</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>466</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

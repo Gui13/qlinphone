@@ -18,6 +18,7 @@ LinphoneWindow::LinphoneWindow(QWidget *parent) :
 	setupChatroomsModel();
 	loadChatRooms();
 	connect(core, &QLinphoneCore::registrationStateChanged, this, &LinphoneWindow::registrationStateChanged);
+    connect(core, &QLinphoneCore::messageReceived, this, &LinphoneWindow::newMessageReceived);
 }
 
 LinphoneWindow::~LinphoneWindow()
@@ -34,7 +35,12 @@ void LinphoneWindow::loadChatRooms() {
 		const LinphoneAddress *addr = linphone_chat_room_get_peer_address(chatroom.getRoom());
 		auto username = linphone_address_get_username(addr);
 		// TODO: use model-based version
-		ui->itemchatroomlist->addItem(username);
+        int unread = linphone_chat_room_get_unread_messages_count(chatroom.getRoom());
+        QString itemText = username;
+        if( unread != 0 ){
+            itemText += QString(" (%1)").arg(unread);
+        }
+        ui->itemchatroomlist->addItem(itemText);
 		row++;
 	}
 }
@@ -110,6 +116,14 @@ void LinphoneWindow::registrationStateChanged(QLProxy cfg, LinphoneRegistrationS
 			break;
 		}
 	}
+}
+
+void LinphoneWindow::newMessageReceived(QLChatRoom room, QLMessage message) {
+    if( &room == (QLChatRoom*)ui->chatList->model() ){
+        // will force the current chatlist to update
+        ui->chatList->setModel(new QLChatRoom(room.getRoom(), this));
+    }
+    loadChatRooms();
 }
 
 void LinphoneWindow::accountOptions_Action_Triggered(QAction* action ){
@@ -208,4 +222,15 @@ void LinphoneWindow::on_accountCombo_currentIndexChanged(int index)
 {
 	linphone_core_set_default_proxy_index(core->core(), index);
 	qDebug() << "Default proxy index set to" << index;
+}
+
+void LinphoneWindow::on_itemchatroomlist_currentRowChanged(int currentRow)
+{
+    if( currentRow == -1 ) return;
+    auto chatRooms = core->chatRooms();
+    QLChatRoom cr = chatRooms.at(currentRow);
+    LinphoneChatRoom* room = cr.getRoom();
+    qDebug() << "Set chat list to follow chatroom" << room << "with" << cr.historySize() << "messages";
+    ui->chatList->setModel(new QLChatRoom(room, this));
+    linphone_chat_room_mark_as_read(room);
 }

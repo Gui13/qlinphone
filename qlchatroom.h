@@ -1,30 +1,36 @@
 #ifndef QLChatRoom_H
 #define QLChatRoom_H
 
-#include <QObject>
+#include <QAbstractListModel>
 #include "linphone/linphonecore.h"
 
-class QLChatRoom : public QObject
+class QLChatRoom : public QAbstractListModel
 {
 	Q_OBJECT
 public:
-	explicit QLChatRoom(QObject *parent = 0);
-	QLChatRoom(LinphoneChatRoom* r) : room(r) {}
-	QLChatRoom(const QLChatRoom& other) : room(other.room) {}
+    explicit QLChatRoom(QObject* parent = 0) : QAbstractListModel(parent) {}
+    QLChatRoom(LinphoneChatRoom* r, QObject *parent = 0) : QAbstractListModel(parent) { setRoom(r);}
+    QLChatRoom(const QLChatRoom& other) { setRoom(other.room);}
 
-	QLChatRoom &operator =(const QLChatRoom& other) {
-		room = other.room;
-		return *this;
-	}
+    QLChatRoom &operator =(const QLChatRoom& other) { room = other.room; return *this; }
+    bool operator==(const QLChatRoom& other) { return room == other.room; }
 
-	int historySize() { return linphone_chat_room_get_history_size(room); }
+    int historySize() const   { return linphone_chat_room_get_history_size(room); }
 	LinphoneChatRoom *getRoom() const { return room; }
+
+    /* QAbstractListModel pure virtuals */
+    int rowCount(const QModelIndex &parent) const { return historySize(); }
+    QVariant data(const QModelIndex &index, int role) const;
+
 signals:
 
 public slots:
 
 private:
 	LinphoneChatRoom* room;
+    QList<LinphoneChatMessage*> msgs;
+
+    void setRoom(LinphoneChatRoom* r);
 };
 
 #endif // QLChatRoom_H

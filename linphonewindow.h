@@ -20,7 +20,9 @@ public:
     ~LinphoneWindow();
 
 	void loadChatRooms();
-	void setupChatroomsModel();
+    void setupChatroomsModel();
+public slots:
+    void newMessageReceived(QLChatRoom room, QLMessage message);
 private slots:
     void on_addConversationBtn_clicked();
 
@@ -37,6 +39,8 @@ private slots:
 	void on_searchBar_returnPressed();
 
 	void on_accountCombo_currentIndexChanged(int index);
+
+    void on_itemchatroomlist_currentRowChanged(int currentRow);
 
 private:
     Ui::LinphoneWindow *ui;

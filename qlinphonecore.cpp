@@ -41,6 +41,7 @@ QLinphoneCore::QLinphoneCore(QObject *parent) : QObject(parent)
     confDir.mkdir("Linphone");
 
     QString config_file = confDir.absolutePath() + "/Linphone/.linphonerc";
+    QString chatDb_file = confDir.absolutePath() + "/Linphone/chatdb.db";
 	qDebug() << "Config file:" << config_file;
 
     static LinphoneCoreVTable vtable = {0};
@@ -51,6 +52,8 @@ QLinphoneCore::QLinphoneCore(QObject *parent) : QObject(parent)
 	vtable.registration_state_changed = qlinphone_registration_state_changed;
 
 	lc = linphone_core_new(&vtable, config_file.toStdString().c_str() , NULL, this);
+
+    linphone_core_set_chat_database_path(lc,chatDb_file.toStdString().c_str());
 
 	// iterate
 	QTimer *timer = new QTimer();
@@ -108,6 +111,7 @@ void QLinphoneCore::iterate()
 
 void QLinphoneCore::onMessageReceived(LinphoneChatRoom *room, LinphoneChatMessage *msg)
 {
+    qDebug() << "Message received for room" << linphone_address_get_username( linphone_chat_room_get_peer_address(room) ) << ", message:" << linphone_chat_message_get_text(msg);
 	emit messageReceived(QLChatRoom(room), QLMessage(msg));
 }
 
