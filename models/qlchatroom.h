@@ -2,6 +2,7 @@
 #define QLChatRoom_H
 
 #include <QAbstractListModel>
+#include <qlmessage.h>
 #include "linphone/linphonecore.h"
 
 class QLChatRoom : public QAbstractListModel
@@ -21,6 +22,7 @@ public:
     /* QAbstractListModel pure virtuals */
     int rowCount(const QModelIndex &parent) const { return historySize(); }
     QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
 signals:
 
@@ -28,7 +30,7 @@ public slots:
 
 private:
 	LinphoneChatRoom* room;
-    QList<LinphoneChatMessage*> msgs;
+    QList<QLMessage*> msgs;
 
     void setRoom(LinphoneChatRoom* r);
 };

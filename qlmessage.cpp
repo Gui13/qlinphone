@@ -1,6 +1,6 @@
 #include "qlmessage.h"
 #include "linphone/linphonecore.h"
-
+#include "QDateTime"
 
 QLMessage::QLMessage(LinphoneChatMessage *msg, QObject *parent) : QObject(parent)
 {
@@ -16,7 +16,12 @@ QLMessage::~QLMessage()
 {
 	if( msg ){
 		linphone_chat_message_unref(msg);
-	}
+    }
+}
+
+bool QLMessage::hasBodyURL() const
+{
+    return linphone_chat_message_get_external_body_url(msg) != NULL;
 }
 
 QString QLMessage::text() const
@@ -30,6 +35,10 @@ QString QLMessage::text() const
 QString QLMessage::state() const
 {
 	return linphone_chat_message_state_to_string(linphone_chat_message_get_state(msg));
+}
+
+QDateTime QLMessage::date() const {
+    return QDateTime::fromTime_t(linphone_chat_message_get_time(msg));
 }
 
 QString QLMessage::from() const

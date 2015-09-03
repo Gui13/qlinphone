@@ -12,10 +12,13 @@ public:
 	QLMessage(const QLMessage& orig);
 	~QLMessage();
 
+    bool hasBodyURL() const;
+
 	QString text() const;
 	QString state() const;
 	QString from() const;
 
+    QDateTime date() const;
 public slots:
 
 private:
