@@ -13,24 +13,27 @@ CONFIG += c++11
 QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-unused-parameter -Wno-unused-variable
 
 SOURCES += main.cpp\
-        linphonewindow.cpp \
+        ui/linphonewindow.cpp \
     qlinphonecore.cpp \
-    qlchatrooms.cpp \
-    qlchatroom.cpp \
+    models/qlchatrooms.cpp \
+    models/qlchatroom.cpp \
     qlmessage.cpp \
-    accountpreferences.cpp \
+    ui/accountpreferences.cpp \
     qlproxy.cpp
 
-HEADERS  += linphonewindow.h \
+HEADERS  += ui/linphonewindow.h \
     qlinphonecore.h \
-    qlchatrooms.h \
-    qlchatroom.h \
+    models/qlchatrooms.h \
+    models/qlchatroom.h \
     qlmessage.h \
-    accountpreferences.h \
+    ui/accountpreferences.h \
     qlproxy.h
 
-FORMS    += linphonewindow.ui \
-    accountpreferences.ui
+FORMS    += ui/linphonewindow.ui \
+    ui/accountpreferences.ui
 
-LIBS += -L/usr/local/lib/ -llinphone -lmediastreamer_base -lmediastreamer_voip -lortp
-INCLUDEPATH += /usr/local/include
+LIBS += -llinphone -lmediastreamer_base -lmediastreamer_voip -lortp
+INCLUDEPATH += ui models
+
+macx:LIBS+= -L/usr/local/lib
+macx:INCLUDEPATH += /usr/local/include
