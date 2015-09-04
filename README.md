@@ -1,5 +1,7 @@
 [![build status](http://ci.neolyse.info/projects/1/status.png?ref=master)](http://ci.neolyse.info/projects/1?ref=master)
 
+## WARNING: This is not yet finished. I'm building this as a side project and hosting it in this incomplete state just because I want to.
+
 A Qt UI for Linphone.
 
 # Build
