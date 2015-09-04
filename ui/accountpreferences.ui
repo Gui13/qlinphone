@@ -261,6 +261,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>identity</tabstop>
+  <tabstop>server</tabstop>
+  <tabstop>registrationPeriod</tabstop>
+  <tabstop>transport</tabstop>
+  <tabstop>route</tabstop>
+  <tabstop>enableRegistration</tabstop>
+  <tabstop>publishPresence</tabstop>
+  <tabstop>enableAVPF</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
