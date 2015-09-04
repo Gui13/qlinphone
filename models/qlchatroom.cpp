@@ -5,15 +5,7 @@ QVariant QLChatRoom::data(const QModelIndex &index, int role) const
 {
     QLMessage* msg = msgs.at(index.row());
     if (role == Qt::DisplayRole ){
-
-        if( msg->hasBodyURL() ){
-            return QVariant("[Image]");
-        } else if (!msg->text().isEmpty()){
-            return QVariant(msg->text());
-        } else {
-            return QString("Unknown message %1").arg(index.row());
-        }
-
+        return QVariant::fromValue(msg);
     } else if( role == Qt::ToolTipRole ){
         return QVariant(msg->date().toString());
     } else {

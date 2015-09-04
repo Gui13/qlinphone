@@ -19,7 +19,9 @@ SOURCES += main.cpp\
     models/qlchatroom.cpp \
     qlmessage.cpp \
     ui/accountpreferences.cpp \
-    qlproxy.cpp
+    qlproxy.cpp \
+    ui/chatbubble.cpp \
+    chatbubblelistdelegate.cpp
 
 HEADERS  += ui/linphonewindow.h \
     qlinphonecore.h \
@@ -27,10 +29,13 @@ HEADERS  += ui/linphonewindow.h \
     models/qlchatroom.h \
     qlmessage.h \
     ui/accountpreferences.h \
-    qlproxy.h
+    qlproxy.h \
+    ui/chatbubble.h \
+    chatbubblelistdelegate.h
 
 FORMS    += ui/linphonewindow.ui \
-    ui/accountpreferences.ui
+    ui/accountpreferences.ui \
+    ui/chatbubble.ui
 
 LIBS += -llinphone -lmediastreamer_base -lmediastreamer_voip -lortp
 INCLUDEPATH += ui models

@@ -25,4 +25,6 @@ private:
 	LinphoneChatMessage* msg;
 };
 
+Q_DECLARE_METATYPE(QLMessage*)
+
 #endif // QLMESSAGE_H

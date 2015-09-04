@@ -7,6 +7,8 @@
 #include "qlinphonecore.h"
 #include "accountpreferences.h"
 #include "qlchatrooms.h"
+#include "chatbubble.h"
+#include "chatbubblelistdelegate.h"
 
 LinphoneWindow::LinphoneWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -14,6 +16,7 @@ LinphoneWindow::LinphoneWindow(QWidget *parent) :
 	core(new QLinphoneCore(this))
 {
 	ui->setupUi(this);
+    ui->chatList->setItemDelegate(new ChatBubbleListDelegate(ui->chatList, new ChatBubble(this)));
 	setupProxyList();
 	setupChatroomsModel();
 	loadChatRooms();
