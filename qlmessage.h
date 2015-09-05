@@ -13,6 +13,7 @@ public:
 	~QLMessage();
 
     bool hasBodyURL() const;
+	bool isOutgoing() const;
 
 	QString text() const;
 	QString state() const;

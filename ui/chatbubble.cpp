@@ -35,6 +35,12 @@ void ChatBubble::setMsg(QLMessage *arg)
         ui->textBrowser->setText(m_msg->text());
     }
 
+	if( m_msg->isOutgoing() ){
+		ui->textBrowser->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+	} else {
+		ui->textBrowser->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+	}
+
     ui->datelabel->setText(m_msg->date().toString());
     emit msgChanged(arg);
 }

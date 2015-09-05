@@ -21,7 +21,12 @@ QLMessage::~QLMessage()
 
 bool QLMessage::hasBodyURL() const
 {
-    return linphone_chat_message_get_external_body_url(msg) != NULL;
+	return linphone_chat_message_get_external_body_url(msg) != NULL;
+}
+
+bool QLMessage::isOutgoing() const
+{
+	return linphone_chat_message_is_outgoing(msg);
 }
 
 QString QLMessage::text() const
