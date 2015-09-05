@@ -12,7 +12,7 @@ A Qt UI for Linphone.
     - Mac:
     
           brew tap Gui13/linphone
-          brew install linphone
+          brew install --head bellesip linphone 
 
     - Ubuntu:
     
