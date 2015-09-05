@@ -7,7 +7,6 @@ class ChatBubbleListDelegate : public QAbstractItemDelegate
 {
 public:
     ChatBubbleListDelegate(QObject *parent = 0);
-    ChatBubbleListDelegate(QObject *parent, ChatBubble *b) : QAbstractItemDelegate(parent), bubble(b) {}
     ~ChatBubbleListDelegate();
 
     // QAbstractItemDelegate interface

@@ -14,7 +14,7 @@ class ChatBubble : public QWidget
 
 public:
     ChatBubble(QLMessage* msg, QWidget *parent = 0);
-    explicit ChatBubble(QWidget *parent = 0) : QWidget(parent) {}
+    explicit ChatBubble(QWidget *parent = 0);
     ~ChatBubble();
 
     Q_PROPERTY(QLMessage* msg READ msg WRITE setMsg NOTIFY msgChanged)

@@ -11,6 +11,13 @@ ChatBubble::ChatBubble(QLMessage *msg, QWidget *parent) :
     setMsg(msg);
 }
 
+ChatBubble::ChatBubble(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::ChatBubble)
+{
+    ui->setupUi(this);
+}
+
 ChatBubble::~ChatBubble()
 {
     delete ui;
@@ -23,9 +30,9 @@ void ChatBubble::setMsg(QLMessage *arg)
 
     m_msg = arg;
     if( m_msg->hasBodyURL() ){
-        ui->text->setText("(image)");
+        ui->textBrowser->setText("(image)");
     } else {
-        ui->text->setText(m_msg->text());
+        ui->textBrowser->setText(m_msg->text());
     }
 
     ui->datelabel->setText(m_msg->date().toString());

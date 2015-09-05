@@ -6,32 +6,32 @@
 
 ChatBubbleListDelegate::ChatBubbleListDelegate(QObject* parent) : QAbstractItemDelegate(parent)
 {
-
+    bubble = new ChatBubble();
 }
 
 ChatBubbleListDelegate::~ChatBubbleListDelegate()
 {
-
+    delete bubble;
 }
 
 void ChatBubbleListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QVariant v = index.data();
     QLMessage* msg = v.value<QLMessage*>();
-    ChatBubble *bubble = new ChatBubble(msg);
-    //bubble.setGeometry(QRect(QPoint(0,0),option.rect.size()));
+
+    bubble->setMsg(msg);
     bubble->setGeometry(QRect(QPoint(0,0),option.rect.size()));
+
     painter->save();
     painter->translate(option.rect.topLeft());
-    qDebug() << "Geometry for msg" << msg->text() << "is" << bubble->geometry() << "with options" << option;
     bubble->render(painter);
-    delete bubble;
     painter->restore();
 }
 
-QSize ChatBubbleListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+QSize ChatBubbleListDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex &index) const
 {
-    ChatBubble bubble(index.data().value<QLMessage*>());
-    qDebug() << "Size for msg is" << bubble.sizeHint();
-    return bubble.sizeHint();
+    ChatBubble* bubble = new ChatBubble();
+    bubble->setMsg(index.data().value<QLMessage*>());
+    qDebug() << "sizehint" << bubble->sizeHint();
+    return bubble->sizeHint();
 }
