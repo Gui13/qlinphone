@@ -42,6 +42,10 @@ private slots:
 
     void on_itemchatroomlist_currentRowChanged(int currentRow);
 
+    void on_sendMessage_clicked();
+
+    void on_messageBox_textChanged(const QString &arg1);
+
 private:
     Ui::LinphoneWindow *ui;
 	QLinphoneCore* core;

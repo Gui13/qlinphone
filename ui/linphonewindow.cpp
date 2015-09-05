@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QMessageBox>
+#include <QScrollBar>
 
 #include "linphonewindow.h"
 #include "ui_linphonewindow.h"
@@ -16,7 +17,7 @@ LinphoneWindow::LinphoneWindow(QWidget *parent) :
 	core(new QLinphoneCore(this))
 {
 	ui->setupUi(this);
-    ui->chatList->setItemDelegate(new ChatBubbleListDelegate(ui->chatList, new ChatBubble(this)));
+    ui->chatList->setItemDelegate(new ChatBubbleListDelegate(ui->chatList));
 	setupProxyList();
 	setupChatroomsModel();
 	loadChatRooms();
@@ -236,4 +237,18 @@ void LinphoneWindow::on_itemchatroomlist_currentRowChanged(int currentRow)
     qDebug() << "Set chat list to follow chatroom" << room << "with" << cr.historySize() << "messages";
     ui->chatList->setModel(new QLChatRoom(room, this));
     linphone_chat_room_mark_as_read(room);
+}
+
+void LinphoneWindow::on_sendMessage_clicked()
+{
+    if(ui->messageBox->text().isEmpty())
+        return;
+
+
+    ui->messageBox->clear();
+}
+
+void LinphoneWindow::on_messageBox_textChanged(const QString &arg1)
+{
+    ui->sendMessage->setEnabled(!ui->messageBox->text().isEmpty());
 }
