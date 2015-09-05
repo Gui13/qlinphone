@@ -244,6 +244,11 @@ void LinphoneWindow::on_sendMessage_clicked()
     if(ui->messageBox->text().isEmpty())
         return;
 
+	auto chatrooms = core->chatRooms();
+	int row = ui->itemchatroomlist->currentIndex().row();
+	auto selected = chatrooms.at(row);
+
+	linphone_chat_room_send_message(selected.getRoom(), ui->messageBox->text().toStdString().c_str());
 
     ui->messageBox->clear();
 }
