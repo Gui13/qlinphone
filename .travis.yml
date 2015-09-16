@@ -1,0 +1,11 @@
+
+language: cpp
+
+install:
+  - sudo add-apt-repository ppa:linphone/release
+  - sudo apt-get update -qq
+  - sudo apt-get install -y qtbase5-dev liblinphone-dev
+
+script:
+  - qmake
+  - make -j3
