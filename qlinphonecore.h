@@ -22,13 +22,15 @@ public:
 
 	LinphoneCore* core() const { return lc; }
 
-    QList<LinphoneProxyConfig *> accounts() const;
-	QList<QLChatRoom> chatRooms() const;
-	LinphoneProxyConfig *createNewProxy() const;
+	const QList<QLChatRoom *> &chatRooms() const { return rooms; }
+	QLChatRoom *addChatRoom(const QString &peer);
+	void eraseChatRoom(QLChatRoom *room);
 
+	const QList<LinphoneProxyConfig *> &accounts() const { return proxies; }
+	LinphoneProxyConfig *createNewProxy() const;
 	void addProxy(LinphoneProxyConfig *cfg);
+	void removeProxy(LinphoneProxyConfig *cfg);
 signals:
-	void chatRoomsUpdated(QList<QLChatRoom> rooms);
 	void messageReceived(QLChatRoom room, QLMessage msg);
 	void registrationStateChanged(QLProxy cfg, LinphoneRegistrationState state);
 
@@ -39,6 +41,8 @@ private slots:
 
 private:
 	LinphoneCore* lc;
+	QList<LinphoneProxyConfig*> proxies;
+	QList<QLChatRoom*> rooms;
 
 	void onMessageReceived(LinphoneChatRoom* room, LinphoneChatMessage* msg);
 	void onRegistrationStateChanged(LinphoneProxyConfig *cfg, LinphoneRegistrationState state);

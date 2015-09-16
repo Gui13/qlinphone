@@ -1,28 +1,25 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QtQuick>
 
 #include "linphonewindow.h"
 #include "ui_linphonewindow.h"
 
 #include "qlinphonecore.h"
 #include "accountpreferences.h"
-#include "qlchatrooms.h"
-#include "chatbubble.h"
-#include "chatbubblelistdelegate.h"
 
 LinphoneWindow::LinphoneWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::LinphoneWindow),
 	core(new QLinphoneCore(this))
 {
+	qmlRegisterType<QLChatRoom,1>("QLChatRoom",1,0,"ChatRoom");
 	ui->setupUi(this);
-    ui->chatList->setItemDelegate(new ChatBubbleListDelegate(ui->chatList));
 	setupProxyList();
-	setupChatroomsModel();
 	loadChatRooms();
 	connect(core, &QLinphoneCore::registrationStateChanged, this, &LinphoneWindow::registrationStateChanged);
-    connect(core, &QLinphoneCore::messageReceived, this, &LinphoneWindow::newMessageReceived);
+	connect(core, &QLinphoneCore::messageReceived, this, &LinphoneWindow::messageReceived);
 }
 
 LinphoneWindow::~LinphoneWindow()
@@ -32,14 +29,14 @@ LinphoneWindow::~LinphoneWindow()
 
 void LinphoneWindow::loadChatRooms() {
 	auto chatrooms = core->chatRooms();
-	chatRoomsModel->clear();
 	ui->itemchatroomlist->clear();
 	int row = 0;
-	foreach (auto chatroom, chatrooms) {
-		const LinphoneAddress *addr = linphone_chat_room_get_peer_address(chatroom.getRoom());
+
+	foreach (QLChatRoom* chatroom, chatrooms) {
+		const LinphoneAddress *addr = linphone_chat_room_get_peer_address(chatroom->getRoom());
 		auto username = linphone_address_get_username(addr);
 		// TODO: use model-based version
-        int unread = linphone_chat_room_get_unread_messages_count(chatroom.getRoom());
+		int unread = linphone_chat_room_get_unread_messages_count(chatroom->getRoom());
         QString itemText = username;
         if( unread != 0 ){
             itemText += QString(" (%1)").arg(unread);
@@ -47,12 +44,6 @@ void LinphoneWindow::loadChatRooms() {
         ui->itemchatroomlist->addItem(itemText);
 		row++;
 	}
-}
-
-void LinphoneWindow::setupChatroomsModel() {
-	chatRoomsModel = new QStandardItemModel(1,2,this);
-	chatRoomsModel->setHeaderData(0, Qt::Horizontal, "Destination");
-	chatRoomsModel->setHeaderData(1, Qt::Horizontal, "Unread Msgs");
 }
 
 void LinphoneWindow::setupProxyList() {
@@ -63,7 +54,6 @@ void LinphoneWindow::setupProxyList() {
 		pix.fill(QColor("grey"));
 		QIcon icon(pix);
 		for( auto proxy : proxies ){
-
 			ui->accountCombo->addItem(icon, linphone_proxy_config_get_identity(proxy));
 		}
 	} else {
@@ -122,11 +112,11 @@ void LinphoneWindow::registrationStateChanged(QLProxy cfg, LinphoneRegistrationS
 	}
 }
 
-void LinphoneWindow::newMessageReceived(QLChatRoom room, QLMessage message) {
-    if( &room == (QLChatRoom*)ui->chatList->model() ){
-        // will force the current chatlist to update
-        ui->chatList->setModel(new QLChatRoom(room.getRoom(), this));
-    }
+void LinphoneWindow::messageReceived(QLChatRoom room, QLMessage message) {
+	int idx = core->chatRooms().indexOf(&room);
+	if( ui->itemchatroomlist->currentIndex().row() == idx ){
+		linphone_chat_room_mark_as_read(room.getRoom());
+	}
     loadChatRooms();
 }
 
@@ -142,7 +132,7 @@ void LinphoneWindow::accountOptions_Action_Triggered(QAction* action ){
 					   QMessageBox::Yes|QMessageBox::No);
 
 		if( reply == QMessageBox::Yes) {
-			linphone_core_remove_proxy_config(core->core(), getCurrentSelectedProxy());
+			core->removeProxy(getCurrentSelectedProxy());
 			setupProxyList();
 		}
 
@@ -162,6 +152,7 @@ LinphoneProxyConfig *LinphoneWindow::getCurrentSelectedProxy() {
 void LinphoneWindow::on_addConversationBtn_clicked()
 {
 	qDebug() << "Should add conversation with " << ui->searchBar->text();
+	on_searchBar_returnPressed();
 }
 
 void LinphoneWindow::on_accountOptions_clicked()
@@ -208,12 +199,9 @@ void LinphoneWindow::on_searchBar_returnPressed()
 {
 	if (validateAddress(ui->searchBar)){
 		qDebug() << "Starting conversation with" << ui->searchBar->text();
-		QByteArray toAddr = ui->searchBar->text().toLatin1();
-		LinphoneCore *c = core->core();
-		const char* to_addr = toAddr.constData();
-		auto chatroom = linphone_core_get_or_create_chat_room(c, to_addr);
+		auto chatroom = core->addChatRoom(ui->searchBar->text());
 
-		auto peeraddr = linphone_chat_room_get_peer_address(chatroom);
+		auto peeraddr = linphone_chat_room_get_peer_address(chatroom->getRoom());
 		char* peerstring = linphone_address_as_string(peeraddr);
 		qDebug() << "Chatroom for" << peerstring;
 		ms_free(peerstring);
@@ -232,10 +220,12 @@ void LinphoneWindow::on_itemchatroomlist_currentRowChanged(int currentRow)
 {
     if( currentRow == -1 ) return;
     auto chatRooms = core->chatRooms();
-    QLChatRoom cr = chatRooms.at(currentRow);
-    LinphoneChatRoom* room = cr.getRoom();
-    qDebug() << "Set chat list to follow chatroom" << room << "with" << cr.historySize() << "messages";
-    ui->chatList->setModel(new QLChatRoom(room, this));
+	QLChatRoom* model = chatRooms.at(currentRow);
+	LinphoneChatRoom* room = model->getRoom();
+	qDebug() << "Set chat list to follow chatroom" << room << "with" << model->historySize() << "messages";
+	connect(core, &QLinphoneCore::messageReceived, model, &QLChatRoom::onMessageReceived);
+	ui->quickChatList->rootContext()->setContextProperty("myModel", model);
+
     linphone_chat_room_mark_as_read(room);
 }
 
@@ -246,10 +236,8 @@ void LinphoneWindow::on_sendMessage_clicked()
 
 	auto chatrooms = core->chatRooms();
 	int row = ui->itemchatroomlist->currentIndex().row();
-	auto selected = chatrooms.at(row);
-
-	linphone_chat_room_send_message(selected.getRoom(), ui->messageBox->text().toStdString().c_str());
-
+	QLChatRoom* selected = chatrooms.at(row);
+	selected->sendMessage(ui->messageBox->text());
     ui->messageBox->clear();
 }
 

@@ -2,6 +2,7 @@
 #define QLMESSAGE_H
 
 #include <QObject>
+#include <QColor>
 #include "linphone/linphonecore.h"
 
 class QLMessage : public QObject
@@ -12,14 +13,25 @@ public:
 	QLMessage(const QLMessage& orig);
 	~QLMessage();
 
-    bool hasBodyURL() const;
+	Q_PROPERTY(QString chatMessage READ chatMessage)
+	Q_PROPERTY(QString formattedDate READ formattedDate)
+	Q_PROPERTY(QString from READ from)
+	Q_PROPERTY(QString state READ state)
+	Q_PROPERTY(bool hasBodyURL READ hasBodyURL)
+	Q_PROPERTY(bool isOutgoing READ isOutgoing)
+	Q_PROPERTY(QColor statusColor READ statusColor)
+
+	bool hasBodyURL() const;
 	bool isOutgoing() const;
 
-	QString text() const;
+	QString chatMessage() const;
 	QString state() const;
 	QString from() const;
+	QString formattedDate() const;
 
-    QDateTime date() const;
+	QDateTime date() const;
+	QColor statusColor() const;
+
 public slots:
 
 private:

@@ -55,6 +55,23 @@ QLinphoneCore::QLinphoneCore(QObject *parent) : QObject(parent)
 
     linphone_core_set_chat_database_path(lc,chatDb_file.toStdString().c_str());
 
+	// build proxies list
+	const MSList* proxyList = linphone_core_get_proxy_config_list(lc);
+	const MSList* proxy = proxyList;
+	while( proxy ){
+		proxies.append((LinphoneProxyConfig*)proxy->data);
+		proxy = proxy->next;
+	}
+
+	// build chatrooms list
+	const MSList* roomsList = linphone_core_get_chat_rooms(lc);
+	const MSList* iter = roomsList;
+	while(iter){
+		rooms.append(new QLChatRoom((LinphoneChatRoom*)iter->data));
+		iter=iter->next;
+	}
+
+
 	// iterate
 	QTimer *timer = new QTimer();
 	connect(timer, &QTimer::timeout, this, &QLinphoneCore::iterate);
@@ -67,33 +84,25 @@ QLinphoneCore::~QLinphoneCore()
 		linphone_core_destroy(lc);
 		lc = NULL;
     }
+	foreach (auto chatRoom, rooms) {
+		delete chatRoom;
+	}
+}
+
+QLChatRoom *QLinphoneCore::addChatRoom(const QString &peer)
+{
+	LinphoneChatRoom* room = linphone_core_create_chat_room(lc, peer.toStdString().c_str());
+	QLChatRoom r(room);
+	if( rooms.contains(&r) ){
+		return rooms.at(rooms.indexOf(&r));
+	} else {
+		auto qroom = new QLChatRoom(r);
+		rooms.append(new QLChatRoom(r));
+		return qroom;
+	}
 }
 
 /* Public API */
-
-QList<LinphoneProxyConfig *> QLinphoneCore::accounts() const
-{
-    QList<LinphoneProxyConfig*> list;
-	const MSList* proxies = linphone_core_get_proxy_config_list(lc);
-    const MSList* proxy = proxies;
-    while( proxy ){
-        list.append((LinphoneProxyConfig*)proxy->data);
-        proxy = proxy->next;
-    }
-	return list;
-}
-
-QList<QLChatRoom> QLinphoneCore::chatRooms() const
-{
-	const MSList* rooms = linphone_core_get_chat_rooms(lc);
-	QList<QLChatRoom> l;
-	const MSList* iter = rooms;
-	while(iter){
-		l.append(QLChatRoom((LinphoneChatRoom*)iter->data));
-		iter=iter->next;
-	}
-	return l;
-}
 
 LinphoneProxyConfig *QLinphoneCore::createNewProxy() const
 {
@@ -102,6 +111,13 @@ LinphoneProxyConfig *QLinphoneCore::createNewProxy() const
 
 void QLinphoneCore::addProxy( LinphoneProxyConfig *cfg){
 	linphone_core_add_proxy_config(lc, cfg);
+	proxies.append(cfg);
+}
+
+void QLinphoneCore::removeProxy(LinphoneProxyConfig *cfg)
+{
+	linphone_core_remove_proxy_config(lc, cfg);
+	proxies.removeAll(cfg);
 }
 
 void QLinphoneCore::iterate()

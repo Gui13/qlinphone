@@ -1,10 +1,5 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2014-12-20T18:48:49
-#
-#-------------------------------------------------
 
-QT += core gui widgets
+QT += core gui widgets quick quickwidgets
 
 TARGET = qlinphone
 TEMPLATE = app
@@ -15,30 +10,26 @@ QMAKE_CXXFLAGS_WARN_ON = -Wall -Wno-unused-parameter -Wno-unused-variable
 SOURCES += main.cpp\
         ui/linphonewindow.cpp \
     qlinphonecore.cpp \
-    models/qlchatrooms.cpp \
     models/qlchatroom.cpp \
     qlmessage.cpp \
     ui/accountpreferences.cpp \
-    qlproxy.cpp \
-    ui/chatbubble.cpp \
-    chatbubblelistdelegate.cpp
+    qlproxy.cpp
 
 HEADERS  += ui/linphonewindow.h \
     qlinphonecore.h \
-    models/qlchatrooms.h \
     models/qlchatroom.h \
     qlmessage.h \
     ui/accountpreferences.h \
-    qlproxy.h \
-    ui/chatbubble.h \
-    chatbubblelistdelegate.h
+    qlproxy.h
 
 FORMS    += ui/linphonewindow.ui \
-    ui/accountpreferences.ui \
-    ui/chatbubble.ui
+    ui/accountpreferences.ui
 
 LIBS += -llinphone -lmediastreamer_base -lmediastreamer_voip -lortp
 INCLUDEPATH += ui models
 
 macx:LIBS+= -L/usr/local/lib
 macx:INCLUDEPATH += /usr/local/include
+
+DISTFILES += \
+    ui/qml/ChatListForm.ui.qml

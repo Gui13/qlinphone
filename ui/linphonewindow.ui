@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>903</width>
-    <height>519</height>
+    <height>616</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -109,17 +109,22 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <layout class="QVBoxLayout" name="messageVLayout">
         <item>
-         <widget class="QListView" name="chatList">
-          <property name="verticalScrollMode">
-           <enum>QAbstractItemView::ScrollPerPixel</enum>
+         <widget class="QQuickWidget" name="quickChatList">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
           </property>
           <property name="resizeMode">
-           <enum>QListView::Adjust</enum>
+           <enum>QQuickWidget::SizeRootObjectToView</enum>
           </property>
-          <property name="selectionRectVisible">
-           <bool>true</bool>
+          <property name="source">
+           <url>
+            <string>file:///Users/gui13/Dev/qlinphone/ui/qml/ChatListForm.ui.qml</string>
+           </url>
           </property>
          </widget>
         </item>
@@ -167,6 +172,13 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header>QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

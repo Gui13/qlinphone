@@ -1,6 +1,7 @@
 #include "qlmessage.h"
 #include "linphone/linphonecore.h"
-#include "QDateTime"
+#include <QDateTime>
+#include <QColor>
 
 QLMessage::QLMessage(LinphoneChatMessage *msg, QObject *parent) : QObject(parent)
 {
@@ -29,7 +30,7 @@ bool QLMessage::isOutgoing() const
 	return linphone_chat_message_is_outgoing(msg);
 }
 
-QString QLMessage::text() const
+QString QLMessage::chatMessage() const
 {
 	QString t;
 	const char* text = linphone_chat_message_get_text(msg);
@@ -43,7 +44,17 @@ QString QLMessage::state() const
 }
 
 QDateTime QLMessage::date() const {
-    return QDateTime::fromTime_t(linphone_chat_message_get_time(msg));
+	return QDateTime::fromTime_t(linphone_chat_message_get_time(msg));
+}
+
+QColor QLMessage::statusColor() const
+{
+	switch(linphone_chat_message_get_state(msg)){
+	case LinphoneChatMessageStateDelivered: return QColor("green");
+	case LinphoneChatMessageStateInProgress: return QColor("orange");
+	case LinphoneChatMessageStateNotDelivered: return QColor("red");
+	}
+	return QColor("grey");
 }
 
 QString QLMessage::from() const
@@ -53,5 +64,10 @@ QString QLMessage::from() const
 	QString from = url;
 	ms_free(url);
 	return from;
+}
+
+QString QLMessage::formattedDate() const
+{
+	return date().toString();
 }
 

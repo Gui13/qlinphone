@@ -20,9 +20,8 @@ public:
     ~LinphoneWindow();
 
 	void loadChatRooms();
-    void setupChatroomsModel();
 public slots:
-    void newMessageReceived(QLChatRoom room, QLMessage message);
+    void messageReceived(QLChatRoom room, QLMessage message);
 private slots:
     void on_addConversationBtn_clicked();
 
