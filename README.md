@@ -1,6 +1,6 @@
-[![build status](http://ci.neolyse.info/projects/1/status.png?ref=master)](http://ci.neolyse.info/projects/1?ref=master)
 
-## WARNING: This is not yet finished. I'm building this as a side project and hosting it in this incomplete state just because I want to.
+## NOTE: This project is not in a functiona state and is developed on the purpose of trying Qt.
+
 
 A Qt UI for Linphone.
 
@@ -11,14 +11,14 @@ A Qt UI for Linphone.
 
     - Mac:
     
-          brew tap Gui13/linphone
-          brew install --head bellesip linphone 
+            brew tap Gui13/linphone
+            brew install --head bellesip linphone 
 
     - Ubuntu:
     
-          sudo add-apt-repository ppa:linphone/release
-          sudo aptitude update
-          sudo aptitude install liblinphone-dev
+            sudo add-apt-repository ppa:linphone/release
+            sudo aptitude update
+            sudo aptitude install liblinphone-dev
 
     Other linuxes should be fine too, qlinphone requires linphone >= 3.8, just make sure you have that.
 
