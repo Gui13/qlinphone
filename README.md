@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Gui13/qlinphone.svg?branch=master)](https://travis-ci.org/Gui13/qlinphone)
 
 ## NOTE: This project is not in a functiona state and is developed on the purpose of trying Qt.
 
