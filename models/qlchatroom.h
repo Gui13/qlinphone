@@ -22,15 +22,17 @@ public:
     QLChatRoom &operator =(const QLChatRoom& other) { room = other.room; return *this; }
     bool operator==(const QLChatRoom& other) { return room == other.room; }
 
-	int historySize() const   { return room?linphone_chat_room_get_history_size(room):0; }
+	int realHistorySize() const   { return room?linphone_chat_room_get_history_size(room):0; }
 	LinphoneChatRoom *getRoom() const { return room; }
 
 	void sendMessage(const QString& msg);
 
     /* QAbstractListModel pure virtuals */
-	int rowCount(const QModelIndex &parent = QModelIndex()) const { return historySize(); }
+	int rowCount(const QModelIndex &parent = QModelIndex()) const { return msgs.size(); }
     QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+	void appendMsg(LinphoneChatMessage *msg);
+	void updateMessage(LinphoneChatMessage *msg);
 protected:
 	QHash<int, QByteArray> roleNames() const;
 

@@ -1,18 +1,46 @@
 #include "qlchatroom.h"
 
 #include <QDateTime>
+#include <QDebug>
+
+
+static void onMessageStateChanged(LinphoneChatMessage *msg, LinphoneChatMessageState state, void *userData)
+{
+	QLChatRoom *thiz = (QLChatRoom *)userData;
+	if (state == LinphoneChatMessageStateInProgress) {
+		thiz->appendMsg(msg);
+	} else {
+		thiz->updateMessage(msg);
+	}
+}
+
+
 void QLChatRoom::sendMessage(const QString &msg)
 {
 	LinphoneChatMessage* chatmsg = linphone_chat_room_create_message(room, msg.toStdString().c_str());
-	int row = rowCount();
-
 	// will change rowCount(), that's why we get it above
-	linphone_chat_room_send_chat_message(room, chatmsg);
+	linphone_chat_room_send_message2(room, chatmsg,onMessageStateChanged, this);
+}
 
-	beginInsertRows(QModelIndex(),row, row);
-	msgs.append(new QLMessage(chatmsg,this));
+void QLChatRoom::appendMsg(LinphoneChatMessage* msg){
+	beginInsertRows(QModelIndex(), rowCount(), rowCount());
+	msgs.append(new QLMessage(msg,this));
 	endInsertRows();
 }
+
+void QLChatRoom::updateMessage(LinphoneChatMessage* msg){
+	int i = 0;
+	qDebug() << "Data changed!";
+	for(auto m : msgs){
+		if( m->uid() == linphone_chat_message_get_storage_id(msg) ){
+			m->setMsg(msg);
+			qDebug() << "Data changed for idx" << i << "new state" << m->state();
+			emit dataChanged(index(i), index(i), QVector<int>(1,StatusRole));
+		}
+		i++;
+	}
+}
+
 
 QVariant QLChatRoom::data(const QModelIndex &index, int role) const
 {

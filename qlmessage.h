@@ -20,6 +20,9 @@ public:
 	Q_PROPERTY(bool hasBodyURL READ hasBodyURL)
 	Q_PROPERTY(bool isOutgoing READ isOutgoing)
 	Q_PROPERTY(QColor statusColor READ statusColor)
+	Q_PROPERTY(unsigned long uid READ uid)
+
+	void setMsg(LinphoneChatMessage*msg);
 
 	bool hasBodyURL() const;
 	bool isOutgoing() const;
@@ -32,7 +35,7 @@ public:
 	QDateTime date() const;
 	QColor statusColor() const;
 
-public slots:
+	unsigned long uid() const;
 
 private:
 	LinphoneChatMessage* msg;

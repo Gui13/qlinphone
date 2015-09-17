@@ -17,7 +17,15 @@ QLMessage::~QLMessage()
 {
 	if( msg ){
 		linphone_chat_message_unref(msg);
-    }
+	}
+}
+
+void QLMessage::setMsg(LinphoneChatMessage *m)
+{
+	if( msg ){
+		linphone_chat_message_unref(msg);
+	}
+	msg = linphone_chat_message_ref(m);
 }
 
 bool QLMessage::hasBodyURL() const
@@ -55,6 +63,11 @@ QColor QLMessage::statusColor() const
 	case LinphoneChatMessageStateNotDelivered: return QColor("red");
 	}
 	return QColor("grey");
+}
+
+unsigned long QLMessage::uid() const
+{
+	return linphone_chat_message_get_storage_id(msg);
 }
 
 QString QLMessage::from() const

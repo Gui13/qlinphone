@@ -222,7 +222,7 @@ void LinphoneWindow::on_itemchatroomlist_currentRowChanged(int currentRow)
     auto chatRooms = core->chatRooms();
 	QLChatRoom* model = chatRooms.at(currentRow);
 	LinphoneChatRoom* room = model->getRoom();
-	qDebug() << "Set chat list to follow chatroom" << room << "with" << model->historySize() << "messages";
+	qDebug() << "Set chat list to follow chatroom" << room << "with" << model->rowCount() << "messages";
 	connect(core, &QLinphoneCore::messageReceived, model, &QLChatRoom::onMessageReceived);
 	ui->quickChatList->rootContext()->setContextProperty("myModel", model);
 
