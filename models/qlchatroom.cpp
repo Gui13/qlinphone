@@ -53,9 +53,11 @@ QHash<int, QByteArray> QLChatRoom::roleNames() const
 void QLChatRoom::onMessageReceived(QLChatRoom room, QLMessage msg)
 {
 	if( room.getRoom() != this->room ) return;
-	beginInsertRows(QModelIndex(), rowCount(), rowCount());
-	msgs.append(new QLMessage(msg, this));
-	endInsertRows();
+	//beginInsertRows(QModelIndex(), rowCount(), rowCount());
+	beginResetModel();
+	msgs.append(new QLMessage(msg));
+	endResetModel();
+	//endInsertRows();
 }
 
 void QLChatRoom::setRoom(LinphoneChatRoom *r)
