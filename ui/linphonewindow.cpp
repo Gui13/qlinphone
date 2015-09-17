@@ -233,7 +233,6 @@ void LinphoneWindow::on_sendMessage_clicked()
 {
     if(ui->messageBox->text().isEmpty())
         return;
-
 	auto chatrooms = core->chatRooms();
 	int row = ui->itemchatroomlist->currentIndex().row();
 	QLChatRoom* selected = chatrooms.at(row);
@@ -243,5 +242,8 @@ void LinphoneWindow::on_sendMessage_clicked()
 
 void LinphoneWindow::on_messageBox_textChanged(const QString &arg1)
 {
-    ui->sendMessage->setEnabled(!ui->messageBox->text().isEmpty());
+	bool text_not_empty   = ! ui->messageBox->text().isEmpty();
+	bool chatroomSelected = ui->itemchatroomlist->currentIndex().row() != -1;
+
+	ui->sendMessage->setEnabled(text_not_empty && chatroomSelected);
 }
