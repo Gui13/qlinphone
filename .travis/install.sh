@@ -4,7 +4,7 @@
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
 
 brew tap Gui13/linphone
-brew install --head bellesip linphone 
+brew install --HEAD gui13/linphone/bellesip gui13/linphone/ortp gui13/linphone/linphone 
 
 else
 
